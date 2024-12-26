@@ -121,4 +121,29 @@
     font-weight: bold;
     cursor: pointer;
   }
+
+  /* styles for edit and delete buttons */
+.edit-comment-btn,
+.delete-comment-btn {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 5px 10px;
+  font-size: 14px;
+  border-radius: 4px;
+  margin-left: 5px;
+}
+
+.edit-comment-btn {
+  color: #007bff;
+}
+
+.delete-comment-btn {
+  color: #dc3545;
+}
+
+.edit-comment-btn:hover,
+.delete-comment-btn:hover {
+  opacity: 0.8;
+}
   

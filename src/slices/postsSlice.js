@@ -3,6 +3,7 @@ import Posts from "../components/Posts/Posts";
 const postsSlice = createSlice({
     name : "posts",
     initialState : {
+        nextCommentId : 1,
         posts:[
             {
                 id: 1,
@@ -13,7 +14,7 @@ const postsSlice = createSlice({
                 likes :0,
                 liked: false,
                 comments: [
-                    {userName: "Ananya Lamba" , text:"Nice Post!" , timeStamp: Date.now()},
+                    {id: 0, userName: "Chiku" , text:"Nice Post!" , timeStamp: Date.now()},
                 ]
 
             },
@@ -39,19 +40,41 @@ const postsSlice = createSlice({
         const post = state.posts.find((p)=> p.id === postId);
         if(post){
             post.comments.push({
-                userName: "prakriti gupta",
+                id:state.nextCommentId++,
+                userName: "Ananya Lamba",
                 text,
                 timeStamp: Date.now(),
             });
         }
-       }
+       },
+
+       editComment:(state, action) =>{
+        const {postId , commentId , updatedText} = action.payload;
+        const post = state.posts.find((p)=> p.id === postId);
+        if(post){
+            const comment = post.comments.find((c)=> c.id === commentId);
+            if(comment){
+                comment.text = updatedText;
+            }
+        }
+       },
+
+       deleteComment:(state , action)=>{
+        const {commentId , postId} = action.payload;
+        console.log("Post ID:", postId);
+        console.log("Comment ID:", commentId);
+        const post = state.posts.find((p)=>p.id === postId);
+        if(post){
+            post.comments = post.comments.filter((c)=> c.id !== commentId);
+        }
+       },
 
 
     },
 });
-// slector for selecting a particular id
+// selector for selecting a particular id
 export const selectPostById = (state, postId) =>
     state.posts.posts.find((post) => post.id === postId);
 
- export const {toggleLike , addComment} = postsSlice.actions;
+ export const {toggleLike , addComment , editComment , deleteComment} = postsSlice.actions;
 export default postsSlice.reducer;

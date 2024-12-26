@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import "./posts.css";
 import {useSelector , useDispatch} from "react-redux";
-import { toggleLike , addComment , selectPostById } from "../../slices/postsSlice";
+import { toggleLike , addComment , selectPostById , editComment , deleteComment} from "../../slices/postsSlice";
 
 const Posts = ({postId}) => {
   const [commentText , setCommentText] = useState("");
   const dispatch = useDispatch();
+  const [editingCommentId, setEditingCommentId] = useState(null);
+const [updatedText, setUpdatedText] = useState("");
+  
   const post = useSelector((state)=> selectPostById(state,postId));
   console.log("selected post:" , post);
   // if there is no post found 
@@ -67,13 +70,76 @@ const Posts = ({postId}) => {
       <div className="post-caption">
         <strong>{post.userName}:</strong>{post.content}
       </div>
-      <div className="comments-list">
+      {/* <div className="comments-list">
        {post.comments.map((comment , index)=>(
         <div key={index} className="comment">
           <strong>{comment.userName}:</strong> {comment.text}
+          <button onClick={handle}>Edit </button>
+          <button>Delete </button>
         </div>
        ))}
-      </div>
+      </div> */}
+      <div className="comments-list">
+  {post.comments.map((comment) => (
+    <div key={comment.id} className="comment">
+      {editingCommentId === comment.id ? (
+        <div>
+          {/* Editing Mode */}
+          <input
+            type="text"
+            value={updatedText}
+            onChange={(e) => setUpdatedText(e.target.value)}
+            className="edit-comment-input"
+          />
+          <button
+            onClick={() => {
+              dispatch(
+                editComment({
+                  postId: post.id,
+                  commentId: comment.id,
+                  updatedText,
+                })
+              );
+              setEditingCommentId(null);
+            }}
+            className="save-comment-btn"
+          >
+            Save
+          </button>
+          <button
+            onClick={() => setEditingCommentId(null)}
+            className="cancel-edit-btn"
+          >
+            Cancel
+          </button>
+        </div>
+      ) : (
+        <div>
+          {/* Display Mode */}
+          <strong>{comment.userName}:</strong> {comment.text}
+          <button
+            onClick={() => {
+              setEditingCommentId(comment.id);
+              setUpdatedText(comment.text);
+            }}
+            className="edit-comment-btn"
+          >
+            Edit
+          </button>
+          <button
+            onClick={() =>
+              dispatch(deleteComment({ postId: post.id, commentId: comment.id }))
+            }
+            className="delete-comment-btn"
+          >
+            Delete
+          </button>
+        </div>
+      )}
+    </div>
+  ))}
+</div>
+
     </div> 
     );
 }
