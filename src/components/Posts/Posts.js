@@ -1,13 +1,36 @@
-import React from "react";
+import React, { useState } from "react";
 import "./posts.css";
-const Posts = () => {
+import {useSelector , useDispatch} from "react-redux";
+import { toggleLike , addComment , selectPostById } from "../../slices/postsSlice";
+
+const Posts = ({postId}) => {
+  const [commentText , setCommentText] = useState("");
+  const dispatch = useDispatch();
+  const post = useSelector((state)=> selectPostById(state,postId));
+  console.log("selected post:" , post);
+  // if there is no post found 
+  if (!post) {
+    return <div className="error">Post not found!</div>;
+  }
+
+  const handleAddComments = () =>{
+    if(commentText.trim()){
+      dispatch(
+        addComment({
+          postId,
+          text: commentText,
+        })
+      )
+      setCommentText("");
+    }
+  }
     return ( 
     <div className="post">
         {/* user info */}
         <div className="post-header">
             <div className="user-info">
             <img src="https://picsum.photos/200/300" alt="image" className="profile-pic" />
-                <h4>lion</h4>
+                <h4>{post.userName}</h4>
             </div>
             <button className="post-options">...</button>
         </div>
@@ -20,11 +43,11 @@ const Posts = () => {
         {/* post actions */}
         <div className="post-actions">
         <div className="action-buttons">
-          <button className="action-btn">❤️</button>
+          <button className="action-btn" onClick={()=>dispatch(toggleLike(postId))}>{post.liked ? "💔" : "❤️"}</button>
           <button className="action-btn">💬</button>
           <button className="action-btn">↗️</button>
         </div>
-        <span className="likes-count">5 likes</span>
+        <span className="likes-count">{post.likes}</span>
       </div>
 
       
@@ -34,21 +57,22 @@ const Posts = () => {
         <textarea
           placeholder="Add a comment..."
           className="comment-input"
+          value={commentText}
+          onChange={(e)=> setCommentText(e.target.value)}
         ></textarea>
-        <button className="post-comment-btn">Post</button>
+        <button className="post-comment-btn" onClick={handleAddComments}>Post</button>
       </div>
 
       {/* Comments Section */}
       <div className="post-caption">
-        <strong>John Doe</strong> This is a sample caption for the post.
+        <strong>{post.userName}:</strong>{post.content}
       </div>
       <div className="comments-list">
-        <div className="comment">
-          <strong>Jane Doe:</strong> This is a comment.
+       {post.comments.map((comment , index)=>(
+        <div key={index} className="comment">
+          <strong>{comment.userName}:</strong> {comment.text}
         </div>
-        <div className="comment">
-          <strong>Mary Jane:</strong> Another great comment!
-        </div>
+       ))}
       </div>
     </div> 
     );
